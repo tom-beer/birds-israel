@@ -5,7 +5,7 @@ from torch.nn import functional as F
 from torch import nn
 import torchvision.models as tvmodels
 import pytorch_lightning as pl
-# import torchmetrics
+import torchmetrics
 
 from timm import create_model as create_timm_model
 import wandb
@@ -30,9 +30,9 @@ class LitMLP(pl.LightningModule):
         self.save_hyperparameters()
 
         # compute the accuracy -- no need to roll your own!
-        # self.train_acc = torchmetrics.Accuracy()
-        # self.valid_acc = torchmetrics.Accuracy()
-        # self.test_acc = torchmetrics.Accuracy()
+        self.train_acc = torchmetrics.Accuracy()
+        self.valid_acc = torchmetrics.Accuracy()
+        self.test_acc = torchmetrics.Accuracy()
 
         self.img_class_map = get_img_class_map()
 
