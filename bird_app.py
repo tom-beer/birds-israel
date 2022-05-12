@@ -6,7 +6,7 @@ from data_module import inference_transforms
 
 class BirdApp:
     def __init__(self):
-        self.model = LitMLP.load_from_checkpoint("lit-wandb/1m3bqyxe/checkpoints/epoch=19-step=2499.ckpt")
+        self.model = LitMLP.load_from_checkpoint("lit-wandb/1b4xvtnf/checkpoints/epoch=99-step=3199.ckpt")
 
     def predict(self, x):
         input_tensor = transform_image(x)
