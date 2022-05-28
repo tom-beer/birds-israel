@@ -1,11 +1,12 @@
 from torch.utils.data import DataLoader
-# from torchvision import transforms
+from torchvision import transforms
 import pytorch_lightning as pl
 from torch.utils.data import Subset
 from sklearn.model_selection import train_test_split
 from timm.data import ImageDataset
 from timm.data.transforms_factory import create_transform
 
+from constants import INPUT_IMAGE_SIZE
 
 timm_transform = create_transform(224, scale=(0.7, 1.0), is_training=True, auto_augment='rand-mstd0.5')
 NUM_WORKERS = 0
@@ -16,7 +17,7 @@ IMAGENET_STATS = ([0.485, 0.456, 0.406],
 
 inference_transforms = transforms.Compose([
               transforms.Resize(size=256),
-              transforms.CenterCrop(size=224),
+              transforms.CenterCrop(size=INPUT_IMAGE_SIZE),
               transforms.ToTensor(),
               transforms.Normalize(*IMAGENET_STATS)
         ])
@@ -31,7 +32,7 @@ class BirdsDataModule(pl.LightningDataModule):
               transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
               transforms.RandomRotation(degrees=15),
               transforms.RandomHorizontalFlip(),
-              transforms.CenterCrop(size=224),
+              transforms.CenterCrop(size=INPUT_IMAGE_SIZE),
               transforms.ToTensor(),
               transforms.Normalize(*IMAGENET_STATS)
         ])

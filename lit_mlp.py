@@ -10,6 +10,8 @@ import torchmetrics
 from timm import create_model as create_timm_model
 import wandb
 
+from constants import INPUT_IMAGE_SIZE
+
 pl.seed_everything(hash("setting random seeds") % 2**32 - 1)
 
 
@@ -81,7 +83,7 @@ class LitMLP(pl.LightningModule):
         self.log("test/acc_epoch", self.test_acc, on_step=False, on_epoch=True)
 
     def test_epoch_end(self, test_step_outputs):  # args are defined as part of pl API
-        dummy_input = torch.zeros((self.batch_size, *(3, 256, 256)), device=self.device)
+        dummy_input = torch.zeros((self.batch_size, *(3, INPUT_IMAGE_SIZE, INPUT_IMAGE_SIZE)), device=self.device)
         model_filename = "model_final.onnx"
         self.to_onnx(model_filename, dummy_input, export_params=True)
         wandb.save(model_filename)
@@ -98,9 +100,15 @@ class LitMLP(pl.LightningModule):
         return logits
 
     def validation_epoch_end(self, validation_step_outputs):
-        dummy_input = torch.zeros((self.batch_size, *(3, 256, 256)), device=self.device)
+        dummy_input = torch.zeros((self.batch_size, *(3, INPUT_IMAGE_SIZE, INPUT_IMAGE_SIZE)),
+                                  device=self.device)
         model_filename = f"model_{str(self.global_step).zfill(5)}.onnx"
-        torch.onnx.export(self, dummy_input, model_filename, opset_version=11)
+        torch.onnx.export(self, dummy_input, 'latest_run' + model_filename, opset_version=11,
+                          input_names=['input'],
+                          output_names=['output'],
+                          dynamic_axes={'input': {0: 'batch_size'},
+                                        'output': {0: 'batch_size'}}
+                          )
         wandb.save(model_filename)
 
         flattened_logits = torch.flatten(torch.cat(validation_step_outputs))
